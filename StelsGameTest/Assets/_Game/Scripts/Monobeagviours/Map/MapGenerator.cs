@@ -3,9 +3,13 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using Zenject;
 using System.Threading.Tasks;
+using System;
+using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
 {
+    public event Action OnGeneratedEvent;
+
     [Header("Prefabs")]
     [SerializeField] private GameObject _groundBlockPrefab;
     [SerializeField] private GameObject _wallBlockPrefab;
@@ -24,11 +28,13 @@ public class MapGenerator : MonoBehaviour
     [Inject] private NavMeshSurface _navMeshSurface;
 
     private Vector2 _noiseOffset;
-    private GameObject _map;
     private Vector3 _startPoint;
     private Vector3 _finishPoint;
 
     private const float BLOCK_RADIUS = 0.5f;
+
+    public Map Map { get; private set; }
+
 
     private void Start()
     {
@@ -52,6 +58,16 @@ public class MapGenerator : MonoBehaviour
             GenerateMap();
             return;
         }
+
+        OnGeneratedEvent?.Invoke();
+    }
+
+    private void ResetMap()
+    {
+        if (Map == null) return;
+
+        Destroy(Map.Object);
+        Map = null;
     }
 
     private void GenerateNoise()
@@ -75,21 +91,21 @@ public class MapGenerator : MonoBehaviour
     private void GenerateModel()
     {
         Vector3 spawnPoint;
-        Vector3 offset = new Vector2(-(float)_size.x / 2 + BLOCK_RADIUS, -(float)_size.y / 2 + BLOCK_RADIUS);
+        Vector2Int borderedSize = new Vector2Int(_size.x + 2, _size.y + 2);
+        Vector3 offset = new Vector2(-(float)borderedSize.x / 2 + BLOCK_RADIUS, -(float)borderedSize.y / 2 + BLOCK_RADIUS);
 
-        _map = new GameObject("Map");
-        _map.transform.SetParent(transform);
+        Map = new Map(borderedSize, transform);
 
-        for (int x = -1; x < _size.x + 1; x++)
+        for (int x = 0; x < borderedSize.x; x++)
         {
-            for (int y = -1; y < _size.y + 1; y++)
+            for (int y = 0; y < borderedSize.y; y++)
             {
                 spawnPoint = new Vector3(x + offset.x, 0, y + offset.y);
 
                 GameObject ground = _groundBlockPrefab;
 
-                bool isStartPoint = x == 0 && y == 0;
-                bool isFinishPoint = x == _size.x && y == _size.y - 1;
+                bool isStartPoint = x == 1 && y == 1;
+                bool isFinishPoint = x == borderedSize.x - 1 && y == borderedSize.y - 2;
 
                 if (isStartPoint)
                 {
@@ -102,11 +118,11 @@ public class MapGenerator : MonoBehaviour
                     ground = _finishBlockPrefab;
                 }
 
-                SpawnBlock(ground, spawnPoint);
+                Map.GroundBlocks[x, y] = SpawnBlock(ground, spawnPoint);
 
                 if (isFinishPoint == false && isStartPoint == false)
                 {
-                    if ((isFinishPoint == false) && (x == -1 || x == _size.x || y == -1 || y == _size.y))
+                    if (x == 0 || x == borderedSize.x - 1 || y == 0 || y == borderedSize.y -1)
                     {
                         SpawnBlock(_wallBlockPrefab, spawnPoint);
                     }
@@ -131,11 +147,6 @@ public class MapGenerator : MonoBehaviour
         return NavMesh.CalculatePath(sourcePoint, targetPoint, NavMesh.AllAreas, path);
     }
 
-    private void ResetMap()
-    {
-        if (_map != null) Destroy(_map);
-    }
-
     private float SampleNoise(int x, int y)
     {
         float xPoint = (float)x / _size.x * (_size.x * _noiseScalePercent) + _noiseOffset.x;
@@ -151,8 +162,8 @@ public class MapGenerator : MonoBehaviour
         return new Color(sample, sample, sample);
     }
 
-    private void SpawnBlock(GameObject prefab, Vector3 spawnPoint)
+    private GameObject SpawnBlock(GameObject prefab, Vector3 spawnPoint)
     {
-        Instantiate(prefab, spawnPoint, Quaternion.identity, _map.transform);
+        return Instantiate(prefab, spawnPoint, Quaternion.identity, Map.Object.transform);
     }
 }
