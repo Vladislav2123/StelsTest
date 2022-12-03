@@ -2,7 +2,6 @@
 
 public class FieldOfView : MonoBehaviour
 {
-
     [SerializeField] private LayerMask layerMask;
     private Mesh mesh;
     private float startingAngle;

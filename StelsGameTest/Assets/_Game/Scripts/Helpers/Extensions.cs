@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public static class Extensions
 {
@@ -65,5 +66,10 @@ public static class Extensions
     public static bool Contains(this LayerMask layermask, int layer)
     {
         return layermask == (layermask | (1 << layer));
+    }
+
+    public static T Random<T>(this List<T> list)
+    {
+        return list[UnityEngine.Random.Range(0, list.Count)];
     }
 }
