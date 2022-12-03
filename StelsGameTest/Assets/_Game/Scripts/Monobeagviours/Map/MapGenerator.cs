@@ -1,13 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
+using Zenject;
+using System.Threading.Tasks;
 
 public class MapGenerator : MonoBehaviour
 {
     [Header("Prefabs")]
-    [SerializeField] private GameObject _groundPrefab;
-    [SerializeField] private GameObject _wallPrefab;
-    [SerializeField] private GameObject _startPrefab;
-    [SerializeField] private GameObject _finishPrefab;
+    [SerializeField] private GameObject _groundBlockPrefab;
+    [SerializeField] private GameObject _wallBlockPrefab;
+    [SerializeField] private GameObject _startBlockPrefab;
+    [SerializeField] private GameObject _finishBlockPrefab;
     [Header("Generation")]
     [SerializeField] private Vector2Int _size;
     [SerializeField, Range(0, 1)] private float _wallSpawnNoiseValue;
@@ -18,8 +21,14 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private RawImage _noiseDisplay;
     [SerializeField] private Button _generateButton;
 
+    [Inject] private NavMeshSurface _navMeshSurface;
+
     private Vector2 _noiseOffset;
     private GameObject _map;
+    private Vector3 _startPoint;
+    private Vector3 _finishPoint;
+
+    private const float BLOCK_RADIUS = 0.5f;
 
     private void Start()
     {
@@ -28,11 +37,21 @@ public class MapGenerator : MonoBehaviour
         _generateButton.onClick.AddListener(GenerateMap);
     }
 
-    private void GenerateMap()
+    private async void GenerateMap()
     {
         ResetMap();
         GenerateNoise();
         GenerateModel();
+
+        await Task.Yield();
+
+        BakeNavMesh();
+
+        if (CheckPathAvailability(_startPoint, _finishPoint) == false)
+        {
+            GenerateMap();
+            return;
+        }
     }
 
     private void GenerateNoise()
@@ -56,7 +75,7 @@ public class MapGenerator : MonoBehaviour
     private void GenerateModel()
     {
         Vector3 spawnPoint;
-        Vector3 offset = new Vector2(-(float)_size.x / 2, -(float)_size.y / 2);
+        Vector3 offset = new Vector2(-(float)_size.x / 2 + BLOCK_RADIUS, -(float)_size.y / 2 + BLOCK_RADIUS);
 
         _map = new GameObject("Map");
         _map.transform.SetParent(transform);
@@ -67,29 +86,49 @@ public class MapGenerator : MonoBehaviour
             {
                 spawnPoint = new Vector3(x + offset.x, 0, y + offset.y);
 
-                GameObject ground = _groundPrefab;
+                GameObject ground = _groundBlockPrefab;
 
                 bool isStartPoint = x == 0 && y == 0;
                 bool isFinishPoint = x == _size.x && y == _size.y - 1;
 
-                if (isStartPoint) ground = _startPrefab;
-                else if (isFinishPoint) ground = _finishPrefab;
+                if (isStartPoint)
+                {
+                    _startPoint = spawnPoint;
+                    ground = _startBlockPrefab;
+                }
+                else if (isFinishPoint)
+                {
+                    _finishPoint = spawnPoint;
+                    ground = _finishBlockPrefab;
+                }
 
-                SpawnCell(ground, spawnPoint);
+                SpawnBlock(ground, spawnPoint);
 
                 if (isFinishPoint == false && isStartPoint == false)
                 {
                     if ((isFinishPoint == false) && (x == -1 || x == _size.x || y == -1 || y == _size.y))
                     {
-                        SpawnCell(_wallPrefab, spawnPoint);
+                        SpawnBlock(_wallBlockPrefab, spawnPoint);
                     }
                     else if (SampleNoise(x, y) >= _wallSpawnNoiseValue)
                     {
-                        SpawnCell(_wallPrefab, spawnPoint);
+                        SpawnBlock(_wallBlockPrefab, spawnPoint);
                     }
                 }
             }
         }
+    }
+
+    private void BakeNavMesh()
+    {
+        _navMeshSurface.BuildNavMesh();
+    }
+
+    private bool CheckPathAvailability(Vector3 sourcePoint, Vector3 targetPoint)
+    {
+        NavMeshPath path = new NavMeshPath();
+
+        return NavMesh.CalculatePath(sourcePoint, targetPoint, NavMesh.AllAreas, path);
     }
 
     private void ResetMap()
@@ -112,7 +151,7 @@ public class MapGenerator : MonoBehaviour
         return new Color(sample, sample, sample);
     }
 
-    private void SpawnCell(GameObject prefab, Vector3 spawnPoint)
+    private void SpawnBlock(GameObject prefab, Vector3 spawnPoint)
     {
         Instantiate(prefab, spawnPoint, Quaternion.identity, _map.transform);
     }
