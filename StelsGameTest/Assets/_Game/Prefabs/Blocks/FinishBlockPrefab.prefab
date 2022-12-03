@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8472908803894138352}
   m_Layer: 0
-  m_Name: FinishGroundPrefab
+  m_Name: FinishBlockPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

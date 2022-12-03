@@ -5,7 +5,7 @@ public class CameraController : MonoBehaviour
 {
     [SerializeField] private float _boundsExpand;
 
-    [Inject] private MapGenerator _mapGenerator;
+    [Inject] private MapController _mapController;
 
     private Camera _camera;
 
@@ -16,17 +16,17 @@ public class CameraController : MonoBehaviour
 
     private void OnEnable()
     {
-        _mapGenerator.OnGeneratedEvent += FitToMap;
+        _mapController.OnGeneratedEvent += FitToMap;
     }
     private void OnDisable()
     {
-        _mapGenerator.OnGeneratedEvent -= FitToMap;
+        _mapController.OnGeneratedEvent -= FitToMap;
 
     }
 
     public void FitToMap()
     {
-        Bounds bounds = _mapGenerator.Map.Bounds;
+        Bounds bounds = _mapController.Map.Bounds;
 
         bounds.Expand(_boundsExpand);
 

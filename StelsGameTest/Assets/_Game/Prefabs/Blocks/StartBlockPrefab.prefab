@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3368298187616795160}
   m_Layer: 0
-  m_Name: StartGroundPrefab
+  m_Name: StartBlockPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

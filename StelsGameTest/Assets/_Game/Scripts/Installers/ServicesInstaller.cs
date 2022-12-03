@@ -4,12 +4,14 @@ using UnityEngine.AI;
 
 public class ServicesInstaller : MonoInstaller
 {
-    [SerializeField] private MapGenerator _mapGenerator;
+    [SerializeField] private InputHandler _inputHandler;
+    [SerializeField] private MapController _mapController;
     [SerializeField] private NavMeshSurface _navMesh;
 
     public override void InstallBindings()
     {
-        Container.Bind<MapGenerator>().FromInstance(_mapGenerator);
+        Container.Bind<InputHandler>().FromInstance(_inputHandler);
+        Container.Bind<MapController>().FromInstance(_mapController);
         Container.Bind<NavMeshSurface>().FromInstance(_navMesh);
     }
 }

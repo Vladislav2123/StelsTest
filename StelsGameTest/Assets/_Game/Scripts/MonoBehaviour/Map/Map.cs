@@ -6,6 +6,8 @@ public class Map
     public GameObject Object { get; private set; }
     public GameObject[,] GroundBlocks { get; }
 
+    public Player Player { get; set; }
+
     private Bounds _bounds;
     public Bounds Bounds
     {

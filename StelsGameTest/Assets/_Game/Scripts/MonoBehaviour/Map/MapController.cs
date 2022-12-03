@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System;
 using Random = UnityEngine.Random;
 
-public class MapGenerator : MonoBehaviour
+public class MapController : MonoBehaviour
 {
     public event Action OnGeneratedEvent;
 
@@ -15,9 +15,12 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private GameObject _wallBlockPrefab;
     [SerializeField] private GameObject _startBlockPrefab;
     [SerializeField] private GameObject _finishBlockPrefab;
+    [Space]
+    [SerializeField] private Player _playerPrefab;
     [Header("Generation")]
     [SerializeField] private Vector2Int _size;
     [SerializeField, Range(0, 1)] private float _wallSpawnNoiseValue;
+    [SerializeField] private bool _generateOnStart;
     [Header("Noise")]
     [SerializeField] private Vector2Int _noiseSize;
     [SerializeField, Range(0,1)] private float _noiseScalePercent;
@@ -25,6 +28,7 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private RawImage _noiseDisplay;
     [SerializeField] private Button _generateButton;
 
+    [Inject] private DiContainer _diContainer;
     [Inject] private NavMeshSurface _navMeshSurface;
 
     private Vector2 _noiseOffset;
@@ -34,11 +38,13 @@ public class MapGenerator : MonoBehaviour
     private const float BLOCK_RADIUS = 0.5f;
 
     public Map Map { get; private set; }
+    public bool IsMapGenerated => Map != null;
 
 
     private void Start()
     {
-        GenerateMap();
+        if (_generateOnStart) GenerateMap();
+        ;
 
         _generateButton.onClick.AddListener(GenerateMap);
     }
@@ -111,6 +117,8 @@ public class MapGenerator : MonoBehaviour
                 {
                     _startPoint = spawnPoint;
                     ground = _startBlockPrefab;
+
+                    Map.Player = SpawnPlayer(spawnPoint);
                 }
                 else if (isFinishPoint)
                 {
@@ -165,5 +173,11 @@ public class MapGenerator : MonoBehaviour
     private GameObject SpawnBlock(GameObject prefab, Vector3 spawnPoint)
     {
         return Instantiate(prefab, spawnPoint, Quaternion.identity, Map.Object.transform);
+    }
+
+    private Player SpawnPlayer(Vector3 spawnPoint)
+    {
+        return _diContainer.InstantiatePrefab(_playerPrefab, spawnPoint, Quaternion.identity, Map.Object.transform)
+            .GetComponent<Player>();
     }
 }
