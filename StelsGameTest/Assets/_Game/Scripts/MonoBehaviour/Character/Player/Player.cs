@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using Zenject;
 
-public class Player : MonoBehaviour
+public class Player : Character
 {
     public event Action OnVolumeChangedEvent;
     public event Action OnMaxVolumeEvent;
@@ -13,9 +13,6 @@ public class Player : MonoBehaviour
     [SerializeField] private float _maxVolume = 10f;
 
     [Inject] private GameStateController _gameStateController;
-
-    public CharacterMovement Movement { get; private set; }
-    public CharacterAnimationHandler AnimationHandler { get; private set; }
 
     private float _volume;
     public float Volume
@@ -36,16 +33,10 @@ public class Player : MonoBehaviour
 
     public float MaxVolume => _maxVolume;
 
-    private void Awake()
-    {
-        Movement = GetComponent<CharacterMovement>();
-        AnimationHandler = GetComponent<CharacterAnimationHandler>();
-    }
-
-    public void Deafeat()
+    public void Defeat()
     {
         AnimationHandler.PlayDefeatAnimation();
-        _gameStateController.State = GameState.Win;
+        _gameStateController.State = GameState.Lose;
     }
 
     private void Update()

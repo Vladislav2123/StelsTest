@@ -4,25 +4,20 @@ public class FieldOfView : MonoBehaviour
 {
     [SerializeField] private LayerMask layerMask;
     private Mesh mesh;
-    private float startingAngle;
 
     public float Fov { get; set; }
-    private Vector3 Origin { get; set; }
-    private float ViewDistance { get; set; }
+    public float ViewDistance { get; set; }
+    public Vector3 Origin => Vector3.zero;
 
     private void Start()
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        Fov = 90f;
-        ViewDistance = 50f;
-        Origin = Vector3.zero;
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         int rayCount = 50;
-        float angle = startingAngle;
         float angleIncrease = Fov / rayCount;
 
         Vector3[] vertices = new Vector3[rayCount + 1 + 1];
@@ -37,17 +32,20 @@ public class FieldOfView : MonoBehaviour
         {
             Vector3 vertex;
 
-            Physics.Raycast(Origin, angle.GetVectorFromAngle(), out RaycastHit raycastHit, ViewDistance, layerMask);
+            Vector3 direction = Quaternion.AngleAxis(-(Fov / 2) + (angleIncrease * i), Vector3.up) * transform.forward;
+
+            Physics.Raycast(transform.position, direction, out RaycastHit raycastHit, ViewDistance, layerMask);
 
             if (raycastHit.collider == null)
             {
                 // No hit
-                vertex = Origin + angle.GetVectorFromAngle() * ViewDistance;
+                Vector3 vertexDirection = Quaternion.AngleAxis(-(Fov / 2) + (angleIncrease * i), Vector3.up) * Vector3.forward;
+                vertex = Origin + vertexDirection * ViewDistance;
             }
             else
             {
                 // Hit object
-                vertex = raycastHit.point;
+                vertex = transform.InverseTransformPoint(raycastHit.point);
             }
             vertices[vertexIndex] = vertex;
 
@@ -61,7 +59,6 @@ public class FieldOfView : MonoBehaviour
             }
 
             vertexIndex++;
-            angle -= angleIncrease;
         }
 
 

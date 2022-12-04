@@ -20,11 +20,11 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientSkyColor: {r: 0.4765931, g: 0.53785455, b: 0.6603774, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: 617d9be015db68348a623b01ea51a8c5, type: 2}
   m_HaloStrength: 0.5
@@ -425,7 +425,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.1
+  m_VoxelSize: 0.083333336
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 0}
 --- !u!4 &219110922
@@ -3649,15 +3649,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5811637687c931049b10e84f2a7e400a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _groundBlockPrefab: {fileID: 204251268514032505, guid: 505f164db82ae964cbd1788312368792, type: 3}
+  _groundBlockPrefab: {fileID: 3247769327364910931, guid: 505f164db82ae964cbd1788312368792, type: 3}
+  _startBlockPrefab: {fileID: -5901026121649439688, guid: 8bfb1b0fb498c984c95eae82e0dfcae0, type: 3}
+  _finishBlockPrefab: {fileID: -6889111179900758332, guid: c84b189da7d4ee043818ed67bc14e2ec, type: 3}
   _wallBlockPrefab: {fileID: 7996550359729690925, guid: ad06cd973b0251941902dad844c0466f, type: 3}
-  _startBlockPrefab: {fileID: 2795475639067552656, guid: 8bfb1b0fb498c984c95eae82e0dfcae0, type: 3}
-  _finishBlockPrefab: {fileID: 9070476944444703864, guid: c84b189da7d4ee043818ed67bc14e2ec, type: 3}
   _playerPrefab: {fileID: 6101981144979919237, guid: fa5c64857cada8948946040209fbb8d6, type: 3}
+  _enemyPrefab: {fileID: 2986316910826455093, guid: 4b1e93fd687acfa469c3782c6b2bf28d, type: 3}
   _size: {x: 10, y: 10}
   _wallSpawnNoiseValue: 0.6
   _generateOnStart: 1
-  _displayNoise: 0
+  _enemiesCount: 1
+  _maxEnemyPlayerRange: 5
+  _displayNoise: 1
   _noiseSize: {x: 10, y: 10}
   _noiseScalePercent: 0.5
   _maxNoiseOffset: {x: 99999, y: 99999}

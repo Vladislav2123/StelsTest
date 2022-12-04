@@ -20,24 +20,33 @@ public static class Extensions
         return new Vector3(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
     }
 
-    public static void SetMaterial(this MeshRenderer meshRenderer, int index, Material material)
+    public static float GetAngleFromVectorFloat(this Vector3 direction)
     {
-        Material[] materials = meshRenderer.materials;
+        direction = direction.normalized;
+        float n = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        if (n < 0) n += 360;
 
-        materials[index] = material;
-        meshRenderer.materials = materials;
+        return n;
     }
 
-    public static void SetMaterial(this MeshRenderer meshRenderer, Material material)
+    public static void SetMaterial(this Renderer renderer, int index, Material material)
     {
-        Material[] materials = meshRenderer.materials;
+        Material[] materials = renderer.materials;
+
+        materials[index] = material;
+        renderer.materials = materials;
+    }
+
+    public static void SetMaterial(this Renderer renderer, Material material)
+    {
+        Material[] materials = renderer.materials;
 
         for (int i = 0; i < materials.Length; i++)
         {
             materials[i] = material;
         }
 
-        meshRenderer.materials = materials;
+        renderer.materials = materials;
     }
 
     public static float RoundTo(this float roundingValue, float roundValue)

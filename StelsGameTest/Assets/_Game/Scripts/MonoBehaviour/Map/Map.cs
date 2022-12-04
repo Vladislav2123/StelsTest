@@ -1,12 +1,14 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Map
 {
     public Vector2Int Size { get; private set; }
     public GameObject Object { get; private set; }
-    public GameObject[,] GroundBlocks { get; }
+    public GroundBlock[,] GroundBlocks { get; }
 
     public Player Player { get; set; }
+    public List<Enemy> Enemies { get; private set; }
 
     private Bounds _bounds;
     public Bounds Bounds
@@ -28,6 +30,7 @@ public class Map
         Object = new GameObject("Map");
         Object.transform.SetParent(parent);
 
-        GroundBlocks = new GameObject[Size.x, Size.y];
+        GroundBlocks = new GroundBlock[Size.x, Size.y];
+        Enemies = new List<Enemy>();
     }
 }
