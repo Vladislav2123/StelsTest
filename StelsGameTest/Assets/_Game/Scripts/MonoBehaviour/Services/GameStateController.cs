@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using Zenject;
 
 public enum GameState
 {
@@ -17,6 +18,10 @@ public class GameStateController : MonoBehaviour
 
     [SerializeField] private GameState _state;
 
+    [Inject] private StartWindow _startWindow;
+    [Inject] private WinWindow _winWindow;
+    [Inject] private LoseWindow _loseWindow;
+
     public bool IsPlaying { get; private set; }
     public GameState State
     {
@@ -27,44 +32,29 @@ public class GameStateController : MonoBehaviour
 
             _state = value;
 
-            switch (value)
-            {
-                case GameState.Menu:
-                    SetMenuState();
-                    break;
-
-                case GameState.Playing:
-                    TryStartGame();
-                    break;
-
-                case GameState.Win:
-                    TryWin();
-                    break;
-
-                case GameState.Lose:
-                    TryLose();
-                    break;
-            }
-
-            OnStateChangedEvent?.Invoke(_state);
+            StartState();
         }
     }
 
-
     private void Start()
     {
-        State = _state;
+        StartState();
     }
 
     private void SetMenuState()
     {
         IsPlaying = false;
+        Debug.Log("MenuState");
+        _startWindow.TryShow();
+
         OnMenuStateEvent?.Invoke();
     }
 
     private void TryStartGame()
     {
         if (IsPlaying) return;
+
+        _startWindow.TryHide();
 
         IsPlaying = true;
         OnGameStartedEvent?.Invoke();
@@ -75,6 +65,7 @@ public class GameStateController : MonoBehaviour
         if (IsPlaying == false) return;
         EndGame();
 
+        _winWindow.TryShow();
         OnWinEvent?.Invoke();
     }
 
@@ -83,6 +74,7 @@ public class GameStateController : MonoBehaviour
         if (IsPlaying == false) return;
         EndGame();
 
+        _loseWindow.TryShow();
         OnLoseEvent?.Invoke();
     }
 
@@ -90,5 +82,29 @@ public class GameStateController : MonoBehaviour
     {
         IsPlaying = false;
         OnGameEndedEvent?.Invoke();
+    }
+
+    private void StartState()
+    {
+        switch (State)
+        {
+            case GameState.Menu:
+                SetMenuState();
+                break;
+
+            case GameState.Playing:
+                TryStartGame();
+                break;
+
+            case GameState.Win:
+                TryWin();
+                break;
+
+            case GameState.Lose:
+                TryLose();
+                break;
+        }
+
+        OnStateChangedEvent?.Invoke(_state);
     }
 }

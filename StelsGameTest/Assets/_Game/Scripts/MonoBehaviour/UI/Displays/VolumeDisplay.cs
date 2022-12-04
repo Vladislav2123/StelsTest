@@ -4,6 +4,7 @@ using Zenject;
 public class VolumeDisplay : UIPanel
 {
     [SerializeField] private UIBar _bar;
+    [SerializeField] private float _hideDelay = 1;
 
     [Inject] private MapController _mapController;
 
@@ -23,5 +24,8 @@ public class VolumeDisplay : UIPanel
     private void DisplayVolume()
     {
         _bar.FillAmount = Player.Volume / Player.MaxVolume;
+
+        if (Player.Volume == 0) TryHide();
+        else TryShow();
     }
 }

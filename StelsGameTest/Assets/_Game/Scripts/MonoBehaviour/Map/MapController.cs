@@ -177,7 +177,7 @@ public class MapController : MonoBehaviour
 
     private GameObject SpawnBlock(GameObject prefab, Vector3 spawnPoint)
     {
-        return Instantiate(prefab, spawnPoint, Quaternion.identity, Map.Object.transform);
+        return _diContainer.InstantiatePrefab(prefab, spawnPoint, Quaternion.identity, Map.Object.transform);
     }
 
     private Player SpawnPlayer(Vector3 spawnPoint)

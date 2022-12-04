@@ -5,21 +5,17 @@ using DG.Tweening;
 public class ScaleAnimation : CustomAnimation
 {
     [SerializeField] private Transform _scalingTransform;
-    [SerializeField] private float _scaleMultiplyer;
-
-    private Vector3 _originScale;
-
-    private void Awake()
-    {
-        _originScale = _scalingTransform.localScale;
-    }
+    [SerializeField] private Vector3 _startScale;
+    [SerializeField] private Vector3 _targetScale;
 
     public override void Play(Action callback = null)
     {
         TryKillAndCreateNewSequence();
 
+        _scalingTransform.localScale = _startScale;
+
         Sequence.Append(
-            _scalingTransform.DOScale(_originScale * _scaleMultiplyer, Properties.Duration)
+            _scalingTransform.DOScale(_targetScale, Properties.Duration)
             .SetEase(Properties.Ease, Properties.EaseOvershoot));
 
         PostProcessAnimation(callback);
@@ -28,6 +24,6 @@ public class ScaleAnimation : CustomAnimation
     public override void Stop()
     {
         TryKillSequence();
-        _scalingTransform.localScale = _originScale;
+        _scalingTransform.localScale = _startScale;
     }
 }

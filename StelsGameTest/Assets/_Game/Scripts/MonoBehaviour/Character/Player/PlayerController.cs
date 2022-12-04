@@ -4,6 +4,7 @@ using Zenject;
 public class PlayerController : MonoBehaviour
 {
     [Inject] private InputHandler _inputHandler;
+    [Inject] private GameStateController _gameStateController;
 
     private Player _player;
 
@@ -14,6 +15,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (_gameStateController.IsPlaying == false) return;
+
         MovePlayer();
     }
 

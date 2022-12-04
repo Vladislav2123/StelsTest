@@ -5,8 +5,8 @@ public class UIPanel : MonoBehaviour
 {
     [SerializeField] protected GameObject _content;
 
-    [SerializeField] private CustomAnimation _showAnimation;
-    [SerializeField] private CustomAnimation _hideAnimation;
+    [SerializeField] protected CustomAnimation _showAnimation;
+    [SerializeField] protected CustomAnimation _hideAnimation;
 
     [Header("Editor")]
     [SerializeField] private Color _showingColor = new Color(0, 1, 0, 0.1f);
