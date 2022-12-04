@@ -22,14 +22,14 @@ public class MapController : MonoBehaviour
     [SerializeField, Range(0, 1)] private float _wallSpawnNoiseValue;
     [SerializeField] private bool _generateOnStart;
     [Header("Noise")]
+    [SerializeField] private bool _displayNoise;
     [SerializeField] private Vector2Int _noiseSize;
     [SerializeField, Range(0,1)] private float _noiseScalePercent;
     [SerializeField] private Vector2 _maxNoiseOffset = new Vector2(99999, 99999);
-    [SerializeField] private RawImage _noiseDisplay;
-    [SerializeField] private Button _generateButton;
 
     [Inject] private DiContainer _diContainer;
     [Inject] private NavMeshSurface _navMeshSurface;
+    [Inject] private MapNoiseDisplay _noiseDisplay;
 
     private Vector2 _noiseOffset;
     private Vector3 _startPoint;
@@ -44,15 +44,12 @@ public class MapController : MonoBehaviour
     private void Start()
     {
         if (_generateOnStart) GenerateMap();
-        ;
-
-        _generateButton.onClick.AddListener(GenerateMap);
     }
 
-    private async void GenerateMap()
+    public async void GenerateMap()
     {
         ResetMap();
-        GenerateNoise();
+        GenerateNoiseTexture();
         GenerateModel();
 
         await Task.Yield();
@@ -76,9 +73,17 @@ public class MapController : MonoBehaviour
         Map = null;
     }
 
-    private void GenerateNoise()
+    private void GenerateNoiseTexture()
     {
         _noiseOffset = new Vector2(Random.Range(0, _maxNoiseOffset.x), Random.Range(0, _maxNoiseOffset.y));
+
+        if(_displayNoise == false)
+        {
+            _noiseDisplay.TryHide();
+            return;
+        }
+
+        _noiseDisplay.TryShow();
 
         Texture2D noiseTexture = new Texture2D(_noiseSize.x, _noiseSize.y);
 
@@ -91,7 +96,7 @@ public class MapController : MonoBehaviour
         }
 
         noiseTexture.Apply();
-        _noiseDisplay.texture = noiseTexture;
+        _noiseDisplay.DisplayNoise(noiseTexture);
     }
 
     private void GenerateModel()
