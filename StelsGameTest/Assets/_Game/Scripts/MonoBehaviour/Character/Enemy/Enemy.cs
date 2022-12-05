@@ -86,6 +86,7 @@ public class Enemy : Character
         if (_distanceToPlayer > _detectionDistance) return;
 
         _directionToPlayer = (Player.transform.position - transform.position).normalized;
+        Debug.DrawRay(transform.position + Vector3.up, _directionToPlayer * _distanceToPlayer, Color.yellow);
         _angleToPlayer = Vector3.Angle(_directionToPlayer, transform.forward);
 
         if (_angleToPlayer > _detectionAngle / 2) return;
@@ -93,6 +94,7 @@ public class Enemy : Character
         if (Physics.Linecast(transform.position + Vector3.up, Player.transform.position + Vector3.up, _obstaclesLayers)) return;
 
         StateMachine.SetStateChase();
+        Debug.Log($"Enemy Annoyed. Angle: {_angleToPlayer}");
     }
 
     private void OnDrawGizmosSelected()
