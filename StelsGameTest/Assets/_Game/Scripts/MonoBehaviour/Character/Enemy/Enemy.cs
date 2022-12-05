@@ -94,7 +94,6 @@ public class Enemy : Character
         if (Physics.Linecast(transform.position + Vector3.up, Player.transform.position + Vector3.up, _obstaclesLayers)) return;
 
         StateMachine.SetStateChase();
-        Debug.Log($"Enemy Annoyed. Angle: {_angleToPlayer}");
     }
 
     private void OnDrawGizmosSelected()

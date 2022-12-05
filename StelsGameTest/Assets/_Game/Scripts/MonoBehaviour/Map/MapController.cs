@@ -69,8 +69,6 @@ public class MapController : MonoBehaviour
 
         GenerateEnemies();
 
-        BakeNavMesh();
-
         OnGeneratedEvent?.Invoke();
     }
 
